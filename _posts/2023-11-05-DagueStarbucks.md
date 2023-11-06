@@ -2,6 +2,9 @@
 layout: single
 title: "대구 스타벅스 입지 분석"
 toc: true
+toc: true
+toc_sticky: true
+toc_label: "페이지 주요 목차"
 ---
 
 ## 대구_달성군,남구,서구,동구 스타벅스 분석
