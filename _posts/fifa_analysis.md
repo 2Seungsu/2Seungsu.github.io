@@ -1,0 +1,357 @@
+### 피파 선수 능력치 분석
+
+
+```python
+import pandas as pd 
+import numpy as np 
+import matplotlib.pyplot as plt 
+import seaborn as sns
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+```
+
+
+```python
+# 1.1  파일 읽어오기
+filename='player_real_final.csv'
+df=pd.read_csv(filename)
+```
+
+## 특성, 타겟 선정
+- 특성 : 능력치 7개
+- 타겟 : potential
+
+
+```python
+df.position = ['FW' if 'S' in i or 'W' in i or 'F' in i else 'MID' if 'M' in i else 'DF' if 'B' in i else 'GK'  for i in df.position]
+df.position.value_counts()
+```
+
+
+
+
+    MID    5564
+    DF     4793
+    FW     2977
+    GK     1752
+    Name: position, dtype: int64
+
+
+
+
+```python
+ndf = pd.concat([df.position,df.age,df.iloc[:,-7:], df.potential],axis=1)
+ndf = pd.concat([ndf,ndf[ndf.position == 'GK'].sample(sum(ndf.position == 'MID')-2000, replace =True),ndf[ndf.position=='FW']],axis=0)
+```
+
+
+```python
+fwDF = ndf[ndf.position == 'FW']
+midDF = ndf[ndf.position == 'MID']
+dfDF = ndf[ndf.position == 'DF']
+gkDF = ndf[ndf.position == 'GK']
+```
+
+### 특성, 타겟 분석
+- 특성이 많으므로 주성분으로 중요한 변수만 추출함
+
+
+```python
+# Scikit-Learn의 PCA 모듈 임포트
+from sklearn.decomposition import PCA
+
+# PCA 모델 초기화 및 주성분 개수 설정
+pca = PCA(n_components=4)
+
+# 특성 데이터(X)에 PCA 모델을 적합
+X_pca = pca.fit_transform(ndf.iloc[:,1:-1])
+
+# 주성분으로 변환된 데이터 출력
+print("Transformed Data (2 Principal Components):")
+print(X_pca)
+
+# 주성분의 설명된 분산량 확인
+explained_variance_ratio = pca.explained_variance_ratio_
+print("Explained Variance Ratio:")
+print(explained_variance_ratio)
+```
+
+    Transformed Data (2 Principal Components):
+    [[-52.27561389  42.00851534  21.27786024  -3.04565481]
+     [-53.41417691  33.31846991  22.24164837   7.23964036]
+     [-50.90165104  40.87730433  23.29044448   5.32533316]
+     ...
+     [ 19.19797616  15.39634054 -26.19090279  -1.997844  ]
+     [  5.82800042   4.36394913 -23.74619612  -6.91871331]
+     [ 10.97936485   0.35469936 -23.16531666   4.6335485 ]]
+    Explained Variance Ratio:
+    [0.79004576 0.12001833 0.04175985 0.02407406]
+    
+
+
+```python
+# 분산설명이 주성분 갯수가 2일 때 90%가 넘으므로 주성분 갯수는 2로 선택
+top_2_pca_indices = explained_variance_ratio.argsort()[-2:][::-1]
+top_2_pca_indices
+```
+
+
+
+
+    array([0, 1], dtype=int64)
+
+
+
+
+```python
+# 주성분 분산 설명력 시각화
+# 주성분 분석 결과에서 설명된 분산량 추출
+explained_variance_ratio = pca.explained_variance_ratio_
+
+# 설명된 분산량 및 누적 설명된 분산량 그래프 그리기
+plt.figure(figsize=(8, 4))
+plt.bar(range(1, len(explained_variance_ratio) + 1), explained_variance_ratio, alpha=0.7, align='center', label='Explained Variance Ratio', color='b')
+plt.xlabel('Principal Components')
+plt.ylabel('Explained Variance Ratio / Cumulative Explained Variance')
+plt.title('Explained Variance Ratio and Cumulative Explained Variance')
+plt.legend()
+plt.show()
+```
+
+
+    
+![png](output_10_0.png)
+    
+
+
+주성분분석으로 차원을 2개로 줄였을 때 실제 데이터분포와 비슷하다. 따라서 주성분분석으로 potential을 예측해보겠다.
+
+### 트레인, 테스트 나누고 분석
+
+
+```python
+from sklearn.model_selection import train_test_split
+```
+
+
+```python
+trainX, testX, trainy, testy = train_test_split(X_pca, ndf.iloc[:,-1],
+                                               random_state=25,
+                                               test_size=0.2,
+                                                stratify=ndf.position
+                                               )
+```
+
+
+```python
+tr_X, val_X, tr_y, val_y = train_test_split(trainX, trainy, 
+                                            test_size=0.2,
+                                            random_state=21)
+```
+
+### 최적 모델 찾기
+
+
+```python
+from sklearn.utils import *
+from sklearn.metrics import *
+import warnings
+
+rets=all_estimators(type_filter='regressor') # 찾는 항목 넣기
+
+result=[]
+for name, estimator_ in rets:
+    try:
+        model=estimator_()
+        if 'Logistic' in name or 'SGD' in name or 'MLP' in name:
+            model.set_params(max_iter=10000)
+        if 'SV' in name:
+            model.set_params(max_iter=100000, dual='auto')   
+ 
+        model.fit(trainX,trainy)
+        sc=model.score(testX,testy)
+        result.append((name, round(sc, 2)))
+    except Exception:
+        pass
+
+sorted(result, key=lambda x : x[1], reverse=True)
+```
+
+    C:\Users\LG\anaconda3\envs\My_Python\lib\site-packages\sklearn\linear_model\_quantile.py:186: FutureWarning: The default solver will change from 'interior-point' to 'highs' in version 1.4. Set `solver='highs'` or to the desired solver to silence this warning.
+    C:\Users\LG\anaconda3\envs\My_Python\lib\site-packages\numpy\core\numeric.py:407: RuntimeWarning: invalid value encountered in cast
+    
+
+
+
+
+    [('ExtraTreesRegressor', 0.64),
+     ('RandomForestRegressor', 0.62),
+     ('BaggingRegressor', 0.59),
+     ('HistGradientBoostingRegressor', 0.5),
+     ('GradientBoostingRegressor', 0.47),
+     ('MLPRegressor', 0.47),
+     ('KNeighborsRegressor', 0.46),
+     ('DecisionTreeRegressor', 0.38),
+     ('AdaBoostRegressor', 0.35),
+     ('ExtraTreeRegressor', 0.34),
+     ('ARDRegression', 0.26),
+     ('BayesianRidge', 0.26),
+     ('ElasticNet', 0.26),
+     ('ElasticNetCV', 0.26),
+     ('HuberRegressor', 0.26),
+     ('Lars', 0.26),
+     ('LarsCV', 0.26),
+     ('Lasso', 0.26),
+     ('LassoCV', 0.26),
+     ('LassoLars', 0.26),
+     ('LassoLarsCV', 0.26),
+     ('LassoLarsIC', 0.26),
+     ('LinearRegression', 0.26),
+     ('OrthogonalMatchingPursuitCV', 0.26),
+     ('PLSRegression', 0.26),
+     ('PoissonRegressor', 0.26),
+     ('Ridge', 0.26),
+     ('RidgeCV', 0.26),
+     ('TransformedTargetRegressor', 0.26),
+     ('TweedieRegressor', 0.26),
+     ('GammaRegressor', 0.25),
+     ('LinearSVR', 0.25),
+     ('TheilSenRegressor', 0.16),
+     ('RANSACRegressor', 0.13),
+     ('OrthogonalMatchingPursuit', 0.04),
+     ('DummyRegressor', -0.0),
+     ('SGDRegressor', -0.07),
+     ('PassiveAggressiveRegressor', -1.24),
+     ('GaussianProcessRegressor', -11.2),
+     ('KernelRidge', -139.86),
+     ('RadiusNeighborsRegressor', -2.6055639664676797e+35)]
+
+
+
+
+```python
+from sklearn.ensemble import RandomForestRegressor
+model = RandomForestRegressor()
+model.fit(trainX, trainy)
+```
+
+
+
+
+<style>#sk-container-id-4 {color: black;}#sk-container-id-4 pre{padding: 0;}#sk-container-id-4 div.sk-toggleable {background-color: white;}#sk-container-id-4 label.sk-toggleable__label {cursor: pointer;display: block;width: 100%;margin-bottom: 0;padding: 0.3em;box-sizing: border-box;text-align: center;}#sk-container-id-4 label.sk-toggleable__label-arrow:before {content: "▸";float: left;margin-right: 0.25em;color: #696969;}#sk-container-id-4 label.sk-toggleable__label-arrow:hover:before {color: black;}#sk-container-id-4 div.sk-estimator:hover label.sk-toggleable__label-arrow:before {color: black;}#sk-container-id-4 div.sk-toggleable__content {max-height: 0;max-width: 0;overflow: hidden;text-align: left;background-color: #f0f8ff;}#sk-container-id-4 div.sk-toggleable__content pre {margin: 0.2em;color: black;border-radius: 0.25em;background-color: #f0f8ff;}#sk-container-id-4 input.sk-toggleable__control:checked~div.sk-toggleable__content {max-height: 200px;max-width: 100%;overflow: auto;}#sk-container-id-4 input.sk-toggleable__control:checked~label.sk-toggleable__label-arrow:before {content: "▾";}#sk-container-id-4 div.sk-estimator input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-4 div.sk-label input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-4 input.sk-hidden--visually {border: 0;clip: rect(1px 1px 1px 1px);clip: rect(1px, 1px, 1px, 1px);height: 1px;margin: -1px;overflow: hidden;padding: 0;position: absolute;width: 1px;}#sk-container-id-4 div.sk-estimator {font-family: monospace;background-color: #f0f8ff;border: 1px dotted black;border-radius: 0.25em;box-sizing: border-box;margin-bottom: 0.5em;}#sk-container-id-4 div.sk-estimator:hover {background-color: #d4ebff;}#sk-container-id-4 div.sk-parallel-item::after {content: "";width: 100%;border-bottom: 1px solid gray;flex-grow: 1;}#sk-container-id-4 div.sk-label:hover label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-4 div.sk-serial::before {content: "";position: absolute;border-left: 1px solid gray;box-sizing: border-box;top: 0;bottom: 0;left: 50%;z-index: 0;}#sk-container-id-4 div.sk-serial {display: flex;flex-direction: column;align-items: center;background-color: white;padding-right: 0.2em;padding-left: 0.2em;position: relative;}#sk-container-id-4 div.sk-item {position: relative;z-index: 1;}#sk-container-id-4 div.sk-parallel {display: flex;align-items: stretch;justify-content: center;background-color: white;position: relative;}#sk-container-id-4 div.sk-item::before, #sk-container-id-4 div.sk-parallel-item::before {content: "";position: absolute;border-left: 1px solid gray;box-sizing: border-box;top: 0;bottom: 0;left: 50%;z-index: -1;}#sk-container-id-4 div.sk-parallel-item {display: flex;flex-direction: column;z-index: 1;position: relative;background-color: white;}#sk-container-id-4 div.sk-parallel-item:first-child::after {align-self: flex-end;width: 50%;}#sk-container-id-4 div.sk-parallel-item:last-child::after {align-self: flex-start;width: 50%;}#sk-container-id-4 div.sk-parallel-item:only-child::after {width: 0;}#sk-container-id-4 div.sk-dashed-wrapped {border: 1px dashed gray;margin: 0 0.4em 0.5em 0.4em;box-sizing: border-box;padding-bottom: 0.4em;background-color: white;}#sk-container-id-4 div.sk-label label {font-family: monospace;font-weight: bold;display: inline-block;line-height: 1.2em;}#sk-container-id-4 div.sk-label-container {text-align: center;}#sk-container-id-4 div.sk-container {/* jupyter's `normalize.less` sets `[hidden] { display: none; }` but bootstrap.min.css set `[hidden] { display: none !important; }` so we also need the `!important` here to be able to override the default hidden behavior on the sphinx rendered scikit-learn.org. See: https://github.com/scikit-learn/scikit-learn/issues/21755 */display: inline-block !important;position: relative;}#sk-container-id-4 div.sk-text-repr-fallback {display: none;}</style><div id="sk-container-id-4" class="sk-top-container"><div class="sk-text-repr-fallback"><pre>RandomForestRegressor()</pre><b>In a Jupyter environment, please rerun this cell to show the HTML representation or trust the notebook. <br />On GitHub, the HTML representation is unable to render, please try loading this page with nbviewer.org.</b></div><div class="sk-container" hidden><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-6" type="checkbox" checked><label for="sk-estimator-id-6" class="sk-toggleable__label sk-toggleable__label-arrow">RandomForestRegressor</label><div class="sk-toggleable__content"><pre>RandomForestRegressor()</pre></div></div></div></div></div>
+
+
+
+
+```python
+from sklearn.model_selection import GridSearchCV
+param_grid = {
+    'n_estimators': [2000],
+    'max_depth': [10,15]} 
+
+# GridSearchCV를 사용하여 최적 하이퍼파라미터 탐색
+grid_search = GridSearchCV(estimator=model, param_grid=param_grid, cv=5, scoring='neg_mean_squared_error', n_jobs=-1)
+grid_search.fit(trainX, trainy)
+```
+
+
+
+
+<style>#sk-container-id-2 {color: black;}#sk-container-id-2 pre{padding: 0;}#sk-container-id-2 div.sk-toggleable {background-color: white;}#sk-container-id-2 label.sk-toggleable__label {cursor: pointer;display: block;width: 100%;margin-bottom: 0;padding: 0.3em;box-sizing: border-box;text-align: center;}#sk-container-id-2 label.sk-toggleable__label-arrow:before {content: "▸";float: left;margin-right: 0.25em;color: #696969;}#sk-container-id-2 label.sk-toggleable__label-arrow:hover:before {color: black;}#sk-container-id-2 div.sk-estimator:hover label.sk-toggleable__label-arrow:before {color: black;}#sk-container-id-2 div.sk-toggleable__content {max-height: 0;max-width: 0;overflow: hidden;text-align: left;background-color: #f0f8ff;}#sk-container-id-2 div.sk-toggleable__content pre {margin: 0.2em;color: black;border-radius: 0.25em;background-color: #f0f8ff;}#sk-container-id-2 input.sk-toggleable__control:checked~div.sk-toggleable__content {max-height: 200px;max-width: 100%;overflow: auto;}#sk-container-id-2 input.sk-toggleable__control:checked~label.sk-toggleable__label-arrow:before {content: "▾";}#sk-container-id-2 div.sk-estimator input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-2 div.sk-label input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-2 input.sk-hidden--visually {border: 0;clip: rect(1px 1px 1px 1px);clip: rect(1px, 1px, 1px, 1px);height: 1px;margin: -1px;overflow: hidden;padding: 0;position: absolute;width: 1px;}#sk-container-id-2 div.sk-estimator {font-family: monospace;background-color: #f0f8ff;border: 1px dotted black;border-radius: 0.25em;box-sizing: border-box;margin-bottom: 0.5em;}#sk-container-id-2 div.sk-estimator:hover {background-color: #d4ebff;}#sk-container-id-2 div.sk-parallel-item::after {content: "";width: 100%;border-bottom: 1px solid gray;flex-grow: 1;}#sk-container-id-2 div.sk-label:hover label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-2 div.sk-serial::before {content: "";position: absolute;border-left: 1px solid gray;box-sizing: border-box;top: 0;bottom: 0;left: 50%;z-index: 0;}#sk-container-id-2 div.sk-serial {display: flex;flex-direction: column;align-items: center;background-color: white;padding-right: 0.2em;padding-left: 0.2em;position: relative;}#sk-container-id-2 div.sk-item {position: relative;z-index: 1;}#sk-container-id-2 div.sk-parallel {display: flex;align-items: stretch;justify-content: center;background-color: white;position: relative;}#sk-container-id-2 div.sk-item::before, #sk-container-id-2 div.sk-parallel-item::before {content: "";position: absolute;border-left: 1px solid gray;box-sizing: border-box;top: 0;bottom: 0;left: 50%;z-index: -1;}#sk-container-id-2 div.sk-parallel-item {display: flex;flex-direction: column;z-index: 1;position: relative;background-color: white;}#sk-container-id-2 div.sk-parallel-item:first-child::after {align-self: flex-end;width: 50%;}#sk-container-id-2 div.sk-parallel-item:last-child::after {align-self: flex-start;width: 50%;}#sk-container-id-2 div.sk-parallel-item:only-child::after {width: 0;}#sk-container-id-2 div.sk-dashed-wrapped {border: 1px dashed gray;margin: 0 0.4em 0.5em 0.4em;box-sizing: border-box;padding-bottom: 0.4em;background-color: white;}#sk-container-id-2 div.sk-label label {font-family: monospace;font-weight: bold;display: inline-block;line-height: 1.2em;}#sk-container-id-2 div.sk-label-container {text-align: center;}#sk-container-id-2 div.sk-container {/* jupyter's `normalize.less` sets `[hidden] { display: none; }` but bootstrap.min.css set `[hidden] { display: none !important; }` so we also need the `!important` here to be able to override the default hidden behavior on the sphinx rendered scikit-learn.org. See: https://github.com/scikit-learn/scikit-learn/issues/21755 */display: inline-block !important;position: relative;}#sk-container-id-2 div.sk-text-repr-fallback {display: none;}</style><div id="sk-container-id-2" class="sk-top-container"><div class="sk-text-repr-fallback"><pre>GridSearchCV(cv=5, estimator=RandomForestRegressor(), n_jobs=-1,
+             param_grid={&#x27;max_depth&#x27;: [10, 15], &#x27;n_estimators&#x27;: [2000]},
+             scoring=&#x27;neg_mean_squared_error&#x27;)</pre><b>In a Jupyter environment, please rerun this cell to show the HTML representation or trust the notebook. <br />On GitHub, the HTML representation is unable to render, please try loading this page with nbviewer.org.</b></div><div class="sk-container" hidden><div class="sk-item sk-dashed-wrapped"><div class="sk-label-container"><div class="sk-label sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-2" type="checkbox" ><label for="sk-estimator-id-2" class="sk-toggleable__label sk-toggleable__label-arrow">GridSearchCV</label><div class="sk-toggleable__content"><pre>GridSearchCV(cv=5, estimator=RandomForestRegressor(), n_jobs=-1,
+             param_grid={&#x27;max_depth&#x27;: [10, 15], &#x27;n_estimators&#x27;: [2000]},
+             scoring=&#x27;neg_mean_squared_error&#x27;)</pre></div></div></div><div class="sk-parallel"><div class="sk-parallel-item"><div class="sk-item"><div class="sk-label-container"><div class="sk-label sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-3" type="checkbox" ><label for="sk-estimator-id-3" class="sk-toggleable__label sk-toggleable__label-arrow">estimator: RandomForestRegressor</label><div class="sk-toggleable__content"><pre>RandomForestRegressor()</pre></div></div></div><div class="sk-serial"><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-4" type="checkbox" ><label for="sk-estimator-id-4" class="sk-toggleable__label sk-toggleable__label-arrow">RandomForestRegressor</label><div class="sk-toggleable__content"><pre>RandomForestRegressor()</pre></div></div></div></div></div></div></div></div></div></div>
+
+
+
+
+```python
+model = grid_search.best_estimator_
+model
+```
+
+
+
+
+<style>#sk-container-id-3 {color: black;}#sk-container-id-3 pre{padding: 0;}#sk-container-id-3 div.sk-toggleable {background-color: white;}#sk-container-id-3 label.sk-toggleable__label {cursor: pointer;display: block;width: 100%;margin-bottom: 0;padding: 0.3em;box-sizing: border-box;text-align: center;}#sk-container-id-3 label.sk-toggleable__label-arrow:before {content: "▸";float: left;margin-right: 0.25em;color: #696969;}#sk-container-id-3 label.sk-toggleable__label-arrow:hover:before {color: black;}#sk-container-id-3 div.sk-estimator:hover label.sk-toggleable__label-arrow:before {color: black;}#sk-container-id-3 div.sk-toggleable__content {max-height: 0;max-width: 0;overflow: hidden;text-align: left;background-color: #f0f8ff;}#sk-container-id-3 div.sk-toggleable__content pre {margin: 0.2em;color: black;border-radius: 0.25em;background-color: #f0f8ff;}#sk-container-id-3 input.sk-toggleable__control:checked~div.sk-toggleable__content {max-height: 200px;max-width: 100%;overflow: auto;}#sk-container-id-3 input.sk-toggleable__control:checked~label.sk-toggleable__label-arrow:before {content: "▾";}#sk-container-id-3 div.sk-estimator input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-3 div.sk-label input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-3 input.sk-hidden--visually {border: 0;clip: rect(1px 1px 1px 1px);clip: rect(1px, 1px, 1px, 1px);height: 1px;margin: -1px;overflow: hidden;padding: 0;position: absolute;width: 1px;}#sk-container-id-3 div.sk-estimator {font-family: monospace;background-color: #f0f8ff;border: 1px dotted black;border-radius: 0.25em;box-sizing: border-box;margin-bottom: 0.5em;}#sk-container-id-3 div.sk-estimator:hover {background-color: #d4ebff;}#sk-container-id-3 div.sk-parallel-item::after {content: "";width: 100%;border-bottom: 1px solid gray;flex-grow: 1;}#sk-container-id-3 div.sk-label:hover label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-3 div.sk-serial::before {content: "";position: absolute;border-left: 1px solid gray;box-sizing: border-box;top: 0;bottom: 0;left: 50%;z-index: 0;}#sk-container-id-3 div.sk-serial {display: flex;flex-direction: column;align-items: center;background-color: white;padding-right: 0.2em;padding-left: 0.2em;position: relative;}#sk-container-id-3 div.sk-item {position: relative;z-index: 1;}#sk-container-id-3 div.sk-parallel {display: flex;align-items: stretch;justify-content: center;background-color: white;position: relative;}#sk-container-id-3 div.sk-item::before, #sk-container-id-3 div.sk-parallel-item::before {content: "";position: absolute;border-left: 1px solid gray;box-sizing: border-box;top: 0;bottom: 0;left: 50%;z-index: -1;}#sk-container-id-3 div.sk-parallel-item {display: flex;flex-direction: column;z-index: 1;position: relative;background-color: white;}#sk-container-id-3 div.sk-parallel-item:first-child::after {align-self: flex-end;width: 50%;}#sk-container-id-3 div.sk-parallel-item:last-child::after {align-self: flex-start;width: 50%;}#sk-container-id-3 div.sk-parallel-item:only-child::after {width: 0;}#sk-container-id-3 div.sk-dashed-wrapped {border: 1px dashed gray;margin: 0 0.4em 0.5em 0.4em;box-sizing: border-box;padding-bottom: 0.4em;background-color: white;}#sk-container-id-3 div.sk-label label {font-family: monospace;font-weight: bold;display: inline-block;line-height: 1.2em;}#sk-container-id-3 div.sk-label-container {text-align: center;}#sk-container-id-3 div.sk-container {/* jupyter's `normalize.less` sets `[hidden] { display: none; }` but bootstrap.min.css set `[hidden] { display: none !important; }` so we also need the `!important` here to be able to override the default hidden behavior on the sphinx rendered scikit-learn.org. See: https://github.com/scikit-learn/scikit-learn/issues/21755 */display: inline-block !important;position: relative;}#sk-container-id-3 div.sk-text-repr-fallback {display: none;}</style><div id="sk-container-id-3" class="sk-top-container"><div class="sk-text-repr-fallback"><pre>RandomForestRegressor(max_depth=15, n_estimators=2000)</pre><b>In a Jupyter environment, please rerun this cell to show the HTML representation or trust the notebook. <br />On GitHub, the HTML representation is unable to render, please try loading this page with nbviewer.org.</b></div><div class="sk-container" hidden><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-5" type="checkbox" checked><label for="sk-estimator-id-5" class="sk-toggleable__label sk-toggleable__label-arrow">RandomForestRegressor</label><div class="sk-toggleable__content"><pre>RandomForestRegressor(max_depth=15, n_estimators=2000)</pre></div></div></div></div></div>
+
+
+
+
+```python
+model.score(trainX,trainy)
+```
+
+
+
+
+    0.9635961845705545
+
+
+
+
+```python
+model.score(testX,testy)
+```
+
+
+
+
+    0.7395502307315759
+
+
+
+
+```python
+model.score(tr_X,tr_y)
+```
+
+
+
+
+    0.9632229395236702
+
+
+
+
+```python
+model.score(val_X,val_y)
+```
+
+
+
+
+    0.9650275954043641
+
+
+
+
+```python
+from sklearn.metrics import *
+mean_squared_error(tr_y,model.predict(tr_X))
+```
+
+
+
+
+    1.349084176300578
+
+
+
+정확도는 높게 나오진 않았지만 mse가 작으므로 이모델을 사용한다.
+
+### 모델로 예측값 생성 및 저장
+
+
+```python
+pre_pcaX=pca.fit_transform(df.iloc[:,-7:])
+pre_y=model.predict(pre_pcaX)
+```
+
+
+```python
+potentialDF = pd.DataFrame(pre_y)
+potentialDF.columns = ["overall_predict"]
+potentialDF.to_csv('potential_predict_age.csv',index=False)
+```
