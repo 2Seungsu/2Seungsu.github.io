@@ -1,6 +1,6 @@
 # main links
 main:
-  \- title: "github"
+  - title: "github"
     url: https://github.com/2Seungsu/
     
   # - title: "About"
