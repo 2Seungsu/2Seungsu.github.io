@@ -2,6 +2,9 @@
 layout: single
 title: "강수량 분석"
 toc: true
+toc_sticky: true
+toc_label: "페이지 주요 목차"
+
 ---
 ## 서해 수온, 기온, 강수량의 상관관계와 시각화 및 회귀분석 
 
