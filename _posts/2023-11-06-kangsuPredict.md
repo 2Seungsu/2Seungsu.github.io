@@ -565,7 +565,8 @@ scale_x_continuous(breaks=range(-10, 40, 5))  + ylim(0,350) + theme(text=element
 
 
     
-![png](output_26_0.png)
+![output_26_0](https://github.com/2Seungsu/AI-BigData_curriculum/assets/141051562/e40978da-b0d4-49f4-9686-5c169d039921)
+
     
 
 
@@ -585,7 +586,7 @@ scale_x_continuous(breaks=range(-10, 40, 5))  + ylim(0,350)  + theme(text=elemen
 
 
     
-![png](output_27_0.png)
+![output_27_0](https://github.com/2Seungsu/AI-BigData_curriculum/assets/141051562/16b8c785-2c2e-4cc4-a518-cb717378023b)
     
 
 
@@ -605,7 +606,7 @@ scale_x_continuous(breaks=range(-10, 40, 5))  + ylim(0,350) + theme(text=element
 
 
     
-![png](output_28_0.png)
+![output_28_0](https://github.com/2Seungsu/AI-BigData_curriculum/assets/141051562/a7c61e42-ddde-41fa-95d6-904d30b6f861)
     
 
 
@@ -625,7 +626,7 @@ scale_x_continuous(breaks=range(-10, 40, 5))  + ylim(0,350) + theme(text=element
 
 
     
-![png](output_29_0.png)
+![output_29_0](https://github.com/2Seungsu/AI-BigData_curriculum/assets/141051562/37c2c88e-fa6f-4b20-9ad4-82a3c16db789)
     
 
 
