@@ -1,9 +1,7 @@
 # main links
-main:
-  \- title: "Home"
-    url: https://2Seungsu.github.io/
-  \- title: "github"
-    url: https://github.com/2Seungsu/
+# main:
+#   \- title: "Home"
+#     url: https://2Seungsu.github.io/
     
   # - title: "About"
   #   url: https://mmistakes.github.io/minimal-mistakes/about/
