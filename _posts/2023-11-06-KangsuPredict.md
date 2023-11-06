@@ -2,14 +2,15 @@
 layout: single
 title: "강수량 분석"
 ---
-## 수온, 기온, 강수량의 상관관계와 시각화 및 회귀분석 
+## 서해 수온, 기온, 강수량의 상관관계와 시각화 및 회귀분석 
 
 
+### 인천
 ```python
 import pandas as pd
 import matplotlib.pyplot as plt
 ```
-### 인천
+
 
 
 ```python
