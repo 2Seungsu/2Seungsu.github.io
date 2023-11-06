@@ -1,8 +1,14 @@
+--- 
+layout: single
+title: "강수량 분석"
+---
+
+
 ```python
 import pandas as pd
 import matplotlib.pyplot as plt
 ```
-
+## 수온, 기온, 강수량의 상관관계와 시각화 및 회귀분석 
 ### 인천
 
 
