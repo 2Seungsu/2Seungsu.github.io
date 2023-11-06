@@ -104,7 +104,7 @@ analytics:
 
 # Site Author
 author:
-  name             : "Your Name"
+  name             : "이승수"
   avatar           : # path of avatar image, e.g. "/assets/images/bio-photo.jpg"
   bio              : "project to become an **AI&BigData Specialist**."
   location         : "Korea"
