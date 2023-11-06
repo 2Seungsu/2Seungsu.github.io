@@ -1,5 +1,14 @@
-### 피파 선수 능력치 분석
+--- 
+layout: single
+title: "피파 선수 데이터 머신러닝"
+toc: true
+toc_sticky: true
+toc_label: "페이지 주요 목차"
 
+---
+
+### 피파 선수 능력치 분석
+## 능력치를 이용해서 선수의 potential을 예측 
 
 ```python
 import pandas as pd 
