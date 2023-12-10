@@ -1,3 +1,15 @@
+--- 
+layout: single
+title: "딥러닝 - 앨범 이미지 시대별 분류"
+toc: true
+toc_sticky: true
+toc_label: "페이지 주요 목차"
+
+---
+
+### 앨범 이미지 시대별 특징 추정
+## 앨범 이미지를 CNN 딥러닝 모델로 학습 후 시대별 분류 및 예측 
+
 ```python
 import numpy as np
 ```
