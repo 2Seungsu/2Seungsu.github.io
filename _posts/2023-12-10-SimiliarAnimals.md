@@ -1,6 +1,6 @@
 --- 
 layout: single
-title: "닮은꼴 동물 예측_머신러닝"
+title: "머신러닝 - 닮은꼴 동물 예측"
 toc: true
 toc_sticky: true
 toc_label: "페이지 주요 목차"
