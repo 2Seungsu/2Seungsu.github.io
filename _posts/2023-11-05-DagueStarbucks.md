@@ -1,6 +1,6 @@
 --- 
 layout: single
-title: "대구 스타벅스 입지 분석_pandas"
+title: "pandas - 대구 스타벅스 입지 분석"
 toc: true
 toc: true
 toc_sticky: true
