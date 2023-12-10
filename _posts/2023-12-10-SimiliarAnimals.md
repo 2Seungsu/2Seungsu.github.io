@@ -302,7 +302,8 @@ plt.imshow(catDegree[5000])
 
 
     
-![png](output_30_1.png)
+![output_30_1](https://github.com/2Seungsu/AI-BigData_curriculum/assets/141051562/d153fe61-e115-4a88-86dc-6f5ff70f6821)
+
     
 
 
