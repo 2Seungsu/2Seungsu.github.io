@@ -1,6 +1,6 @@
 --- 
 layout: single
-title: "강수량 분석"
+title: "강수량 예측_가설검정"
 toc: true
 toc_sticky: true
 toc_label: "페이지 주요 목차"
