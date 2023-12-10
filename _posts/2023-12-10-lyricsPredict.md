@@ -1,3 +1,16 @@
+--- 
+layout: single
+title: "텍스트마이닝 - 노래 가사 장르 분석"
+toc: true
+toc_sticky: true
+toc_label: "페이지 주요 목차"
+
+---
+
+### 노래가사 장르 분류 
+## 장르별 토픽 분석 및 노래가사 장르 예측
+
+
 ```python
 import pandas as pd
 import numpy as np
