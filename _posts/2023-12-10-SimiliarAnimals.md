@@ -1,3 +1,15 @@
+--- 
+layout: single
+title: "닮은꼴 동물 예측_머신러닝"
+toc: true
+toc_sticky: true
+toc_label: "페이지 주요 목차"
+
+---
+
+### 동물상 이미지 분석
+## 대표적인 동물상 연예인 이미지 학습 후 닮은꼴 동물 예측
+
 ```python
 import cv2, os
 import matplotlib.pyplot as plt
