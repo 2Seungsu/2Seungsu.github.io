@@ -150,8 +150,7 @@ plt.imshow(dogList[10])
 
 
     
-![png](output_17_1.png)
-    
+![output_17_1](https://github.com/2Seungsu/AI-BigData_curriculum/assets/141051562/6f828692-86fe-45d9-b95d-1e1a6641bcc8)    
 
 
 
