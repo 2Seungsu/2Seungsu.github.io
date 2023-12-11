@@ -1,3 +1,15 @@
+--- 
+layout: single
+title: "시계열 분석 - 주식 그래프 유사도"
+toc: true
+toc_sticky: true
+toc_label: "페이지 주요 목차"
+
+---
+
+### 코스피, 코스닥 지수 그래프와 종목 하나당 유사도 분석
+## 날짜 입력시 가장 유사한 그래프와 예상 수익률 출력
+
 ```python
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
