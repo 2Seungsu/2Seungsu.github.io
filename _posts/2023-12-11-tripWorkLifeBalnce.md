@@ -176,7 +176,7 @@ year2020_11['일일영업시간'].plot.box()
 
 
     
-![png](output_8_1.png)
+![output_8_1](https://github.com/2Seungsu/bigdata_contest/assets/141051562/69d666e0-586d-4bc8-8f9d-7b8110e87630)
     
 
 
@@ -680,7 +680,7 @@ sns.barplot(x='산업분야', y='일일평균영업시간', hue='년도', data=s
 
 
     
-![png](output_34_2.png)
+![output_34_2](https://github.com/2Seungsu/bigdata_contest/assets/141051562/0efad16c-fd47-434f-9e64-19f84e981751)
     
 
 
@@ -709,7 +709,7 @@ sns.barplot(x='산업분야', y='연간총매출액_전체(백만원)', hue='년
 
 
     
-![png](output_35_2.png)
+![output_35_2](https://github.com/2Seungsu/bigdata_contest/assets/141051562/30b6dd66-ea2d-443b-97b5-ec62f16d67e4)
     
 
 
@@ -739,7 +739,7 @@ sns.barplot(x='산업분야', y='일일평균영업시간', hue='년도', data=s
 
 
     
-![png](output_36_2.png)
+![output_36_2](https://github.com/2Seungsu/bigdata_contest/assets/141051562/8669e7be-d3c1-4b2d-8095-4e9d6120cbe5)
     
 
 
@@ -771,7 +771,7 @@ plt.ylim(0,80000)
 
 
     
-![png](output_37_2.png)
+![output_37_2](https://github.com/2Seungsu/bigdata_contest/assets/141051562/64f0cdb7-148f-471f-9c2c-4bd1d1427fcc)
     
 
 
@@ -801,7 +801,7 @@ plt.ylim(9.5,10)
 
 
     
-![png](output_38_2.png)
+![output_38_2](https://github.com/2Seungsu/bigdata_contest/assets/141051562/f8dbe5e3-3aeb-4a91-b131-c69130b2dbf9)
     
 
 
@@ -830,7 +830,7 @@ sns.barplot(x='산업분야', y='연간총매출액_전체(백만원)', hue='년
 
 
     
-![png](output_39_2.png)
+![output_39_2](https://github.com/2Seungsu/bigdata_contest/assets/141051562/f51e4aae-c7f7-4690-9ac8-adfba5eeb384)
     
 
 ### 관광업 종사자의 워라벨 분석
@@ -1141,7 +1141,7 @@ plt.show()
 
 
     
-![png](output_9_0.png)
+![output_9_0](https://github.com/2Seungsu/bigdata_contest/assets/141051562/6fd7d862-577e-49df-96ff-a3546cad14ad)
     
 
 
@@ -1162,7 +1162,7 @@ plt.show()
 
 
     
-![png](output_10_0.png)
+![output_10_0](https://github.com/2Seungsu/bigdata_contest/assets/141051562/86b44bf3-06cd-409f-b37b-e73120060a7b)
     
 
 
@@ -1205,7 +1205,7 @@ plt.show()
 
 
     
-![png](output_14_0.png)
+![output_14_0](https://github.com/2Seungsu/bigdata_contest/assets/141051562/100780d4-7fe6-47d1-b771-c2955cc46328)
     
 
 
@@ -1226,7 +1226,7 @@ plt.show()
 
 
     
-![png](output_15_0.png)
+![output_15_0](https://github.com/2Seungsu/bigdata_contest/assets/141051562/db321986-49f5-47b2-843d-d483d852b01b)
     
 
 
@@ -1311,7 +1311,7 @@ plt.show()
 
 
     
-![png](output_18_0.png)
+![output_18_0](https://github.com/2Seungsu/bigdata_contest/assets/141051562/dcd85d8c-e0d7-44fb-abd6-6c4ce095850e)
     
 
 
@@ -1334,6 +1334,6 @@ plt.show()
 
 
     
-![png](output_19_0.png)
+![output_19_0](https://github.com/2Seungsu/bigdata_contest/assets/141051562/4c5656c1-dd60-451f-bedd-84ca4f2d38c2)
     
 
