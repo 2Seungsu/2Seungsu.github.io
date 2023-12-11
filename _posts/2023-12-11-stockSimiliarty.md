@@ -194,7 +194,7 @@ print(mean_list)
 
 
     
-![png](output_4_1.png)
+![output_4_1](https://github.com/2Seungsu/bigdata_contest/assets/141051562/e3ed0551-cfef-4ded-a00d-e383ea400daa)
     
 
 
@@ -436,7 +436,7 @@ print(mean_list)
 
 
     
-![png](output_9_1.png)
+![output_9_1](https://github.com/2Seungsu/bigdata_contest/assets/141051562/d7f4f10a-8559-4e38-b4b0-6c821195a590)
     
 
 
