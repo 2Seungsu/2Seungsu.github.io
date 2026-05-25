@@ -1,6 +1,7 @@
 --- 
 layout: single
 title: "예측 - 로또 번호 추천"
+excerpt: "2002~2026년 로또 1등 번호 추천"
 toc: true
 toc_sticky: true
 toc_label: "페이지 주요 목차"
