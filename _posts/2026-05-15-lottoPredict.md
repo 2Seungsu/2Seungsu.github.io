@@ -11,7 +11,6 @@ toc_label: "페이지 주요 목차"
 ## 2002~2026년 로또 1등 번호 패턴 및 조합을 학습한 AI모델
 ## 데이터 불러오기
 
-
 ```python
 import pandas as pd 
 import numpy as np
@@ -202,7 +201,7 @@ df
 </div>
 
 
-#### 피쳐엔지니어링
+### 피쳐엔지니어링
 
 ```python
 import random
@@ -379,7 +378,7 @@ def make_label(features):
     return 1 if score >= 7 else 0
 ```
 
-#### 데이터셋 생성
+### 데이터셋 생성
 ```python
 # =========================================
 # 학습 데이터 생성
@@ -484,7 +483,7 @@ len(sample_weights), len(sample_weights_train), len(sample_weights_test)
     (3245, 2271, 974)
 
 
-#### 모델 학습
+### 모델 학습
 
 ```python
 # =========================================
