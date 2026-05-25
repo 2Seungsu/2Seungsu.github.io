@@ -1,6 +1,6 @@
 --- 
 layout: single
-title: "시각화 - 관광산업 워라밸과 매출액을 중심으로"
+title: "예측 - 로또 번호 추천"
 toc: true
 toc_sticky: true
 toc_label: "페이지 주요 목차"
@@ -8,7 +8,7 @@ toc_label: "페이지 주요 목차"
 ---
 
 # 2002~2026년 로또 1등 번호 추천  
-## 2002~2026년 로또 1등 번호 패턴, 조합을 이용한 AI모델
+### 2002~2026년 로또 1등 번호 패턴, 조합을 이용한 AI모델
 
 ```python
 import pandas as pd 
